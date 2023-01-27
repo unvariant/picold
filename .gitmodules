@@ -1,0 +1,9 @@
+[submodule "lib/zig-clap"]
+	path = lib/zig-clap
+	url = https://github.com/Hejsil/zig-clap
+[submodule "libs/--branch"]
+	path = libs/--branch
+	url = https://github.com/Hejsil/zig-clap
+[submodule "libs/zig-clap"]
+	path = libs/zig-clap
+	url = https://github.com/Hejsil/zig-clap
