@@ -11,9 +11,7 @@ pub fn build(b: *std.build.Builder) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
     const mode = b.standardReleaseOptions();
 
-    const exe = b.addExecutable("zlink", "src/main.zig");
-
-    exe.addPackagePath("clap", "libs/zig-clap/clap.zig");
+    const exe = b.addExecutable("picold", "src/main.zig");
 
     exe.setTarget(target);
     exe.setBuildMode(mode);

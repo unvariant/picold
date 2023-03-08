@@ -1,4 +1,8 @@
 # auto created zig directories
-
 zig-cache/
 zig-out/
+
+# binaries
+**/*.o
+**/*.elf
+**/*.bin
