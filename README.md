@@ -1,4 +1,4 @@
-# zlink
+# picold
 
 1. parse ELF header and locate sections
 2. parse the section that holds the section names
