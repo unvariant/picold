@@ -6,3 +6,6 @@ zig-out/
 **/*.o
 **/*.elf
 **/*.bin
+
+# fuck macos
+**/*.DS_Store
