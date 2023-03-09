@@ -10,8 +10,6 @@ const ArrayList = std.ArrayList;
 const process = std.process;
 const testing = std.testing;
 const elf64 = @import("elf64.zig");
-const utils = @import("utils.zig");
-//const iterator = @import("iterator.zig");
 const StringHashMap = std.StringHashMap;
 
 pub fn main () !void {
@@ -60,7 +58,11 @@ pub fn link (allocator: mem.Allocator, relative_path: []const u8) !void {
     for (sections) |section| {
         const name = section_names.get(section.sh_name);
         var sh = elf64.Section.new(section);
-        section_map.put(name, utils.alloc(@TypeOf(sh), &sh, allocator)) catch {};
+        var new = try allocator.create(elf64.Section);
+        inline for (@typeInfo(elf64.Section).Struct.fields) |field| {
+            @field(new, field.name) = @field(sh, field.name);
+        } 
+        try section_map.put(name, new);
     }
 
     for (symbols.items()) |symbol| {
@@ -112,6 +114,9 @@ pub fn link (allocator: mem.Allocator, relative_path: []const u8) !void {
             flags.PF_X = true;
         }
         if (@bitCast(u32, flags) != 0) {
+            flags.PF_W = true;
+            flags.PF_R = true;
+            flags.PF_X = true;
             try segments.append(.{
                 .kind = .PT_LOAD,
                 .flags = flags,
@@ -188,15 +193,24 @@ pub fn link (allocator: mem.Allocator, relative_path: []const u8) !void {
 
     if (segments.items.len > 0) {
         var fileoff: usize = hdr.e_shoff + hdr.e_shnum * hdr.e_shentsize;
-        for (sects.values()) |section| {
+        var iter = sects.iterator();
+        while (iter.next()) |entry| {
+            var section = entry.value_ptr.*;
             fileoff = mem.alignForward(fileoff, section.addralign.?);
             section.offset = fileoff;
+            if (section.addr) |*addr| {
+                addr.* += fileoff;
+            }
+            if (mem.eql(u8, entry.key_ptr.*, ".text")) {
+                hdr.e_entry = section.addr.?;
+            }
             fileoff += section.filesize();
         }
         
         var index: usize = 0;
         while (index < segments.items.len) : (index += 1) {
             segments.items[index].offset = sects.values()[index].offset;
+            segments.items[index].vaddr.? += sects.values()[index].offset;
         }
     }
 

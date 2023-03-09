@@ -11,7 +11,6 @@ const HashMap = std.AutoHashMap;
 const StringHashMap = std.StringHashMap;
 const ArrayHashMap = std.ArrayHashMap;
 
-const utils = @import("utils.zig");
 const Buffer = @import("main.zig").Buffer;
 
 pub const RelocType = enum(u32) {
@@ -484,10 +483,6 @@ pub const Segment = struct {
             .p_memsz = self.memsz,
             .p_align = self.alignment,
         };
-    }
-
-    pub fn drop (self: *Self, allocator: anytype) void {
-        return utils.drop(Self, self, allocator);
     }
 };
 

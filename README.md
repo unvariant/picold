@@ -3,8 +3,8 @@
 1. parse ELF header and locate sections
 2. parse the section that holds the section names
 3. parse the section that holds the symbol names
-4. generate symbol table
-5. parse any relocation entries
+4. parse any relocation entries
+5. solve relocation entry values
 6. stitch ELF file back together
  - resolve all symbols into symtab
    - optional
