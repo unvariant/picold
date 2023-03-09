@@ -1,14 +1,19 @@
+const std = @import("std");
 const builtin = @import("builtin");
 
+const elf = std.elf;
+
 pub usingnamespace switch (builtin.cpu.arch) {
-    .i386 => struct {
-        pub const Addr = u32;
-        pub const Offset = u32;
-        pub const Half = u16;
-        pub const Word = u32;
-        pub const Sword = i32;
+    .i386, .arm => struct {
+        pub const Ehdr = elf.Elf32_Ehdr;
+        pub const Phdr = elf.Elf32_Phdr;
+        pub const Shdr = elf.Elf64_Shdr;
+
+
     },
-    .x86_64 => struct {
-        pub const Addr = u64;
+    .x86_64, .aarch64 => struct {
+        pub const Ehdr = elf.Elf64_Ehdr;
+        pub const Phdr = elf.Elf64_Phdr;
+        pub const Shdr = elf.Elf64_Phdr;
     }
-}
+};

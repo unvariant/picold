@@ -9,3 +9,6 @@ zig-out/
 
 # fuck macos
 **/*.DS_Store
+
+# temporary files
+tmp*
