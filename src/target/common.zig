@@ -8,14 +8,15 @@ const mem = std.mem;
 const Type = std.builtin.Type;
 const Tuple = meta.Tuple;
 const Array = std.BoundedArray;
-const EnumField = Type.EnumField;
 const StructField = Type.StructField;
+
+pub const EnumField = Type.EnumField;
 
 pub fn mergeEnums (comptime T: type, comptime new: []const EnumField) type {
     switch (@typeInfo(T)) {
         .Enum => |old| {
             const fields = old.fields ++ new;
-            const is_exhaustive = fields.len >= @truncate(old.tag_type, 0xFFFFFFFFFFFFFFFF);
+            const is_exhaustive = fields.len >= @truncate(old.tag_type, -1);
             const newtype = .{
                 .Enum = .{
                     .layout = .Auto,
@@ -43,6 +44,18 @@ fn tryEnum (comptime T: type, comptime n: comptime_int) ?type {
         },
         else => @compileError(@typeName(T) ++ " is not an Enum"),
     }
+}
+
+fn itoa (comptime target: usize) []const u8 {
+    if (target == 0) {
+        return &[_]u8{ '0', };
+    }
+    var buffer: []const u8 = &[_]u8{};
+    var n = target;
+    while (n > 0) : (n /= 10) {
+        buffer = &[_]u8{ n % 10 + 0x30, } ++ buffer;
+    }
+    return buffer;
 }
 
 pub fn SectionType (comptime Tag: type) type {
@@ -79,9 +92,7 @@ pub fn SectionType (comptime Tag: type) type {
     });
 }
 
-pub fn SectionFlags (comptime Tag: type, comptime new: []Tuple(&.{ []const u8, usize, })) type {
-    // TODO: create comptime packed struct with fields at specified offsets
-    _ = new;
+pub fn SectionFlags (comptime Tag: type) type {
     const Flags = packed struct {
         write: bool = false,
         alloc: bool = false,
